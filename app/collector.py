@@ -10,6 +10,8 @@ from playwright.sync_api import sync_playwright
 from .config import HOME, URL, setup
 from . import database as db
 from .parser import parse
+from .browser import resolve_browser, LABELS, SystemBrowserError
+from playwright.sync_api import Error as PlaywrightError
 
 class LoginRequired(Exception): pass
 
@@ -20,10 +22,14 @@ def progress(**fields):
     os.replace(tmp,path)
 
 def launch_context(p, visible=False):
+    channel=resolve_browser()
     proxy=getproxies().get('https')
-    return p.chromium.launch_persistent_context(str(HOME/'browser_profile'),headless=not visible,
-        channel='chromium',proxy={'server':proxy} if proxy else None,
-        viewport={'width':1280,'height':850},accept_downloads=False)
+    try:
+        return p.chromium.launch_persistent_context(str(HOME/'browser_profile'),headless=not visible,
+            channel=channel,proxy={'server':proxy} if proxy else None,
+            viewport={'width':1280,'height':850},accept_downloads=False)
+    except PlaywrightError as exc:
+        raise SystemBrowserError(f'系统{LABELS[channel]}未能启动。请先关闭看板专用登录窗口后重试；若浏览器更新后出现此问题，请更新看板的Playwright兼容版本。本程序不会下载备用浏览器。') from exc
 
 def get_page(page,url):
     for attempt in range(3):
@@ -58,7 +64,7 @@ def sync(full=False,visible=False):
                         page.wait_for_timeout(1500)
                         if page.is_closed(): raise LoginRequired()
                         if 'login.php' not in page.url and not page.locator('input[type=password]').count():
-                            if page.locator('#mypages').count() and ('稿費' in page.locator('#mypages').inner_text()): break
+                            if page.locator('#mypages').count() and any(word in page.locator('#mypages').inner_text() for word in ('稿費','稿费')): break
                     # Reload the read-only ledger, not whichever destination login selected.
                 queue=[URL]; seen=set(); counts=Counter(); first_batch=None; newest_balance=None
                 earliest=None; latest=None; observed=[]

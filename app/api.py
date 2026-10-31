@@ -14,6 +14,7 @@ from . import database as db
 from .statistics import summary
 from .exports import export
 from .exchange_rates import refresh
+from .browser import read_preference, save_preference, SystemBrowserError
 
 def create_app(service):
     app=FastAPI(docs_url=None,redoc_url=None,openapi_url=None)
@@ -45,11 +46,17 @@ def create_app(service):
     def sync(full:bool=False,login:bool=False): return {'started':service.start_sync(full,login)}
     @app.get('/api/settings')
     def settings():
-        return {'interval':db.setting('interval'),'site_timezone':db.setting('site_timezone'),'timezone_confirmed':db.setting('timezone_confirmed'),'data_dir':str(HOME),'backups':[p.name for p in sorted((HOME/'backups').glob('*.sqlite3'),reverse=True)],'checkpoint':db.setting('checkpoint')}
+        return {'browser':read_preference(),'interval':db.setting('interval'),'site_timezone':db.setting('site_timezone'),'timezone_confirmed':db.setting('timezone_confirmed'),'data_dir':str(HOME),'backups':[p.name for p in sorted((HOME/'backups').glob('*.sqlite3'),reverse=True)],'checkpoint':db.setting('checkpoint')}
     @app.post('/api/settings')
     async def save_settings(req:Request):
         data=await req.json()
         if data.get('interval') not in (0,1,5,15,30): raise HTTPException(400,'同步间隔无效')
+        if 'browser' in data:
+            with service.lock:
+                if service.busy() and data['browser'] != read_preference():
+                    raise HTTPException(409,'请先等待同步或登录窗口结束，再切换采集浏览器。')
+                try: save_preference(data['browser'])
+                except SystemBrowserError as exc: raise HTTPException(400,str(exc))
         db.set_setting('interval',data['interval'])
         if 'timezone_confirmed' in data: db.set_setting('timezone_confirmed',bool(data['timezone_confirmed']))
         return {'ok':True}

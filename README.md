@@ -12,7 +12,7 @@
 
 ### 2. 安装运行工具
 
-- Windows 10/11 64位。
+- Windows 10/11 64位，已安装 Microsoft Edge 或 Google Chrome 稳定版。
 - 安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)，安装后重新打开终端或资源管理器。
 - 安装 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)，已有该组件时无需重复安装。
 
@@ -22,13 +22,13 @@
 
 双击解压目录里的 **start.cmd**。
 
-首次运行会下载 Python（如缺失）、项目依赖和专用 Chromium 浏览器，需要联网并等待数分钟。Chromium压缩下载约200MB，解压后占用数百MB；后续启动复用已有文件。
+首次运行会下载 Python（如缺失）、项目依赖，需要联网并等待数分钟。采集直接使用系统已有的Edge或Chrome，不额外下载浏览器。
 
 准备完成后会自动打开独立看板窗口。之后仍双击 `start.cmd` 启动。
 
 ### 4. 首次登录
 
-点击 **登录海棠并同步**，在弹出的海棠浏览器窗口中自行输入账号、密码和验证码。进入稿费页后自动开始同步，完成后登录窗口关闭。
+点击 **登录海棠并同步**，在弹出的系统浏览器专用窗口中自行输入账号、密码和验证码。进入稿费页后自动开始同步，完成后登录窗口关闭。
 
 后续启动会复用登录状态，先显示已有数据，再后台同步；登录失效时重新登录即可。
 
@@ -68,8 +68,7 @@
 
 ```powershell
 uv sync --locked --managed-python
-$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location) 'outputs\海棠稿费看板\runtime\browsers'
-.\.venv\Scripts\python.exe -m playwright install chromium --no-shell
+.\.venv\Scripts\python.exe -m app.browser
 .\.venv\Scripts\python.exe launcher.py
 ```
 
@@ -78,3 +77,13 @@ $env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location) 'outputs\海棠稿费�
 ## 主要组件
 
 Python、pywebview／WebView2、FastAPI、Playwright、SQLite、openpyxl，以及随项目提供的 [Apache ECharts](https://echarts.apache.org/) 本地资源。ECharts的Apache-2.0许可证位于 `app/frontend/vendor/ECHARTS-LICENSE.txt`。
+
+## 系统浏览器兼容性
+
+默认跟随Windows的默认浏览器（支持已安装的Chrome／Edge）。默认浏览器为Firefox等其他浏览器、或无法识别时，请在看板设置中选择已有的Chrome或Edge；不会擅自改变系统默认浏览器。浏览器程序沿用系统安装和更新；看板仅使用独立的登录配置目录，不占用日常浏览器配置。切换浏览器后可能需要重新登录海棠。
+
+使用Playwright官方的`msedge`/`chrome`稳定频道，不固定浏览器版本或复制浏览器程序。没有兼容浏览器时明确提示，不自动下载替代浏览器。浏览器未来升级如发生协议或企业策略变化，需要更新看板的Playwright版本并验证，不能保证任意未来版本始终兼容。
+
+在 **设置 → 登录与采集浏览器** 可选择跟随系统默认、Google Chrome或Microsoft Edge；选择仅保存在当前用户数据目录，不随源码包发布。看板主界面始终为独立窗口，关闭即停止同步。
+
+高级用法：需要临时指定Chrome时，可在PowerShell中设置 `$env:HAITANG_BROWSER='chrome'` 后运行；指定Edge使用 `msedge`，未配置时为 `auto`，跟随系统默认；环境变量优先于看板内设置。

@@ -15,8 +15,3 @@ SCALE = 100000000
 def setup():
     for name in ('data','browser_profile','backups','exports','logs'):
         (HOME/name).mkdir(parents=True, exist_ok=True)
-    browsers = INSTALL/'runtime'/'browsers'
-    if not getattr(sys, 'frozen', False) and not browsers.is_dir():
-        browsers = INSTALL/'outputs'/'海棠稿费看板'/'runtime'/'browsers'
-    os.environ['PLAYWRIGHT_BROWSERS_PATH'] = str(browsers)
-
