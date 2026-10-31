@@ -1,0 +1,6 @@
+[project]
+name = "haitang-dashboard"
+version = "0.1.0"
+description = "海棠稿费本地看板"
+requires-python = ">=3.13,<3.14"
+dependencies = ["pywebview>=6", "fastapi", "uvicorn", "playwright", "beautifulsoup4", "httpx", "openpyxl", "tzdata"]
