@@ -10,27 +10,27 @@
 
 点击仓库页面的 **Code → Download ZIP**，下载后完整解压到一个固定文件夹。不要直接在压缩包里运行。
 
-### 2. 安装运行工具
-
-- Windows 10/11 64位，已安装 Microsoft Edge 或 Google Chrome 稳定版。
-- 安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)，安装后重新打开终端或资源管理器。
-- 安装 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)，已有该组件时无需重复安装。
-
-不需要预先安装 Python、Node.js 或 Excel。uv 会为项目准备 Python 3.13 和独立依赖环境。
-
-### 3. 启动
+### 2. 启动
 
 双击解压目录里的 **start.cmd**。
 
-首次运行会下载 Python（如缺失）、项目依赖，需要联网并等待数分钟。采集直接使用系统已有的Edge或Chrome，不额外下载浏览器。
+首次运行会下载 Python（如缺失）、项目依赖，需要联网并等待数分钟。采集直接使用系统已有的Edge或Chrome。
 
 准备完成后会自动打开独立看板窗口。之后仍双击 `start.cmd` 启动。
 
-### 4. 首次登录
+### 3. 首次登录
 
 点击 **登录海棠并同步**，在弹出的系统浏览器专用窗口中自行输入账号、密码和验证码。进入稿费页后自动开始同步，完成后登录窗口关闭。
 
 后续启动会复用登录状态，先显示已有数据，再后台同步；登录失效时重新登录即可。
+
+### 所需依赖（会自动检测并安装）
+
+- 浏览器：Windows 10/11 64位，已安装 Microsoft Edge 或 Google Chrome 稳定版。
+- 安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)，安装后重新打开终端或资源管理器，已有该组件时无需重复安装。
+- 安装 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)，已有该组件时无需重复安装。
+
+不需要预先安装 Python、Node.js 或 Excel。uv 会为项目准备 Python 3.13 和独立依赖环境。
 
 ## 常用操作
 
